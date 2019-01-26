@@ -74,6 +74,7 @@ while True:
     if witch!=None:
         count=count+1
     if count==10:
+        location = witch
         break
 
     print("fire at node: "+str(witch))
@@ -82,7 +83,7 @@ while True:
 ID = 2
 
 if node != 0:
-    DATA = node
+    DATA = location
     data = {"ID":ID,"DATA":DATA}
     r = requests.get("http://dbwo4011.cafe24.com/KO/KOREA/saveData.php",params = data)
     print(r.text)
