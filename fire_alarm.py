@@ -1,19 +1,44 @@
 import serial
-import sensor
 import sys
 sys.path.insert(0, '/home/pi/iBeacon-Scanner-')
 import sort
-import environment
 import requests
 import json
 
+port="/dev/ttyUSB0"
+serialFromArduino = serial.Serial(port, 9600)
+serialFromArduino.flushInput()
+
+def sensor():
+    variable = int(serialFromArduino.readline())
+    return variable
+
+def node():
+    node_list = {
+        1 : {1: 0, 2: 0, 3: 0, 4: 0},
+        2 : {3: 0, 4: 0, 5: 0, 6: 0},
+        3 : {4: 0, 6: 0, 7: 0, 8: 0},
+        4 : {7: 0, 8: 0, 9: 0, 10: 0},
+        5 : {9: 0, 10: 0, 11: 0, 12: 0},
+        6 : {11: 0, 12: 0, 13: 0, 14: 0},
+        7 : {11: 0, 14: 0, 15: 0},
+        8 : {11: 0, 15: 0, 16: 0, 17: 0},
+        9 : {13: 0, 14: 0, 18: 0, 19: 0},
+        10 : {18: 0, 19: 0, 20: 0, 21: 0},
+        11 : {21: 0, 22: 0, 23: 0},
+        12 : {22: 0, 23: 0, 24: 0, 25: 0},
+        13 : {7: 0, 9: 0, 26: 0, 27: 0}
+    }
+    return node_list
     
-def alarm():
+def alarm(beacon, mapping):
+    """
     beacon = []
     beacon = sort.sorting()
     print("beacon on: "+str(beacon))
 
-    mapping = environment.node()
+    mapping = node()
+    """
     for i in beacon:
         judge = [0]*50
         for key, value in mapping.items():
@@ -27,20 +52,32 @@ def alarm():
                 if judge[key]==len(mapping[key]):
                     return key
 
-port="/dev/ttyUSB0"
-serialFromArduino = serial.Serial(port, 9600)
-serialFromArduino.flushInput()
 
 while True:
-    fire_sensor = int(sensor.alarm())
+    fire_sensor = int(sensor())
     print("sensor status: "+str(fire_sensor))
     if(fire_sensor==1):
         print("fire detected")
         break
 
-for i in range(0, 11):
-    node = alarm()
-    print("fire at node: "+str(node))
+count = 0
+
+while True:
+    beacon = []
+    beacon = sort.sorting()
+    print("beacon on: "+str(beacon))
+
+    mapping = node()
+
+    witch = alarm(beacon, mapping)
+
+    if witch!=None:
+        count=count+1
+    if count==10:
+        break
+
+    print("fire at node: "+str(witch))
+
 
 ID = 2
 
